@@ -1,6 +1,4 @@
-
 import sys
-
 
 LOGGING_CONFIG = {
     'version': 1,
@@ -10,8 +8,8 @@ LOGGING_CONFIG = {
             'level': 'INFO',
             'handlers': ['vk-stdout'],
             'propagate': False,
-            },
         },
+    },
     'handlers': {
         'vk-stdout': {
             'class': 'logging.StreamHandler',

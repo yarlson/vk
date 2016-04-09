@@ -3,18 +3,17 @@
 import os
 import sys
 import time
-
 import unittest
 
-import vk
 import utils
+import vk
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # copy to test_props.py and fill it
-USER_LOGIN = ''         # user email or phone number
-USER_PASSWORD = ''      # user password
-APP_ID = ''             # aka API/Client ID
+USER_LOGIN = ''  # user email or phone number
+USER_PASSWORD = ''  # user password
+APP_ID = ''  # aka API/Client ID
 
 from test_props import USER_LOGIN, USER_PASSWORD, APP_ID
 
@@ -31,7 +30,6 @@ class UtilsTestCase(unittest.TestCase):
 
 
 class VkTestCase(unittest.TestCase):
-
     def setUp(self):
         auth_session = vk.AuthSession(app_id=APP_ID, user_login=USER_LOGIN, user_password=USER_PASSWORD)
         access_token, _ = auth_session.get_access_token()

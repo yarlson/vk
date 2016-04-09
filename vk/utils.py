@@ -1,13 +1,10 @@
-
-import re
 import logging
+import re
 from collections import Iterable
 
 import requests
 
-
 logger = logging.getLogger('vk')
-
 
 try:
     # Python 2
@@ -26,12 +23,10 @@ except ImportError:
     # Python 3
     from urllib.parse import urlparse, parse_qsl, urlencode
 
-
 try:
     import simplejson as json
 except ImportError:
     import json
-
 
 try:
     # Python 2

@@ -1,16 +1,13 @@
 # coding=utf8
 
-import logging
 import logging.config
 
-from vk.logs import LOGGING_CONFIG
-from vk.utils import stringify_values, json_iter_parse, LoggingSession, str_type
 from vk.exceptions import VkAuthError, VkAPIError
+from vk.logs import LOGGING_CONFIG
 from vk.mixins import AuthMixin, InteractiveMixin
-
+from vk.utils import stringify_values, json_iter_parse, LoggingSession, str_type
 
 VERSION = '2.0.2'
-
 
 logging.config.dictConfig(LOGGING_CONFIG)
 logger = logging.getLogger('vk')
@@ -25,6 +22,7 @@ class Session(object):
 
         self.access_token = access_token
         self.access_token_is_needed = False
+        self.censored_access_token = ''
 
         self.requests_session = LoggingSession()
         self.requests_session.headers['Accept'] = 'application/json'
@@ -38,19 +36,20 @@ class Session(object):
             self.access_token = self.get_access_token()
         else:
             logger.debug('Use old access token')
-        return self._access_token
+        return self.access_token
 
     @access_token.setter
     def access_token(self, value):
-        self._access_token = value
+        self.access_token = value
         if isinstance(value, str_type) and len(value) >= 12:
             self.censored_access_token = '{}***{}'.format(value[:4], value[-4:])
         else:
             self.censored_access_token = value
         logger.debug('access_token = %r', self.censored_access_token)
-        self.access_token_is_needed = not self._access_token
+        self.access_token_is_needed = not self.access_token
 
-    def get_user_login(self):
+    @staticmethod
+    def get_user_login():
         logger.debug('Do nothing to get user login')
 
     def get_access_token(self):
@@ -58,7 +57,7 @@ class Session(object):
         Dummy method
         """
         logger.debug('API.get_access_token()')
-        return self._access_token
+        return self.access_token
 
     def make_request(self, method_request, captcha_response=None):
 
@@ -102,41 +101,45 @@ class Session(object):
                     raise error
 
     def send_api_request(self, request, captcha_response=None):
-        url = self.API_URL + request._method_name
-        method_args = request._api._method_default_args.copy()
-        method_args.update(stringify_values(request._method_args))
+        url = self.API_URL + request.method_name
+        method_args = request.api.method_default_args.copy()
+        method_args.update(stringify_values(request.method_args))
         access_token = self.access_token
         if access_token:
             method_args['access_token'] = access_token
         if captcha_response:
             method_args['captcha_sid'] = captcha_response['sid']
             method_args['captcha_key'] = captcha_response['key']
-        timeout = request._api._timeout
+        timeout = request.api.timeout
         response = self.requests_session.post(url, method_args, timeout=timeout)
         return response
 
-    def get_captcha_key(self, captcha_image_url):
+    @staticmethod
+    def get_captcha_key(captcha_image_url):
         """
         Default behavior on CAPTCHA is to raise exception
         Reload this in child
         """
         return None
-    
-    def auth_code_is_needed(self, content, session):
+
+    @staticmethod
+    def auth_code_is_needed(content, session):
         """
         Default behavior on 2-AUTH CODE is to raise exception
         Reload this in child
-        """           
+        """
         raise VkAuthError('Authorization error (2-factor code is needed)')
-    
-    def auth_captcha_is_needed(self, content, session):
+
+    @staticmethod
+    def auth_captcha_is_needed(content, session):
         """
         Default behavior on CAPTCHA is to raise exception
         Reload this in child
-        """              
+        """
         raise VkAuthError('Authorization error (captcha)')
-    
-    def phone_number_is_needed(self, content, session):
+
+    @staticmethod
+    def phone_number_is_needed(content, session):
         """
         Default behavior on PHONE NUMBER is to raise exception
         Reload this in child
@@ -159,18 +162,18 @@ class API(object):
 
 
 class Request(object):
-    __slots__ = ('_api', '_method_name', '_method_args')
+    __slots__ = ('api', 'method_name', 'method_args')
 
     def __init__(self, api, method_name):
-        self._api = api
-        self._method_name = method_name
+        self.api = api
+        self.method_name = method_name
 
     def __getattr__(self, method_name):
-        return Request(self._api, self._method_name + '.' + method_name)
+        return Request(self.api, self.method_name + '.' + method_name)
 
     def __call__(self, **method_args):
-        self._method_args = method_args
-        return self._api._session.make_request(self)
+        self.method_args = method_args
+        return self.api.session.make_request(self)
 
 
 class AuthSession(AuthMixin, Session):
