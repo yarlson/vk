@@ -28,37 +28,6 @@ class Session(object):
         self.requests_session.headers['Accept'] = 'application/json'
         self.requests_session.headers['Content-Type'] = 'application/x-www-form-urlencoded'
 
-    @property
-    def access_token(self):
-        logger.debug('Check that we need new access token')
-        if self.access_token_is_needed:
-            logger.debug('We need new access token. Try to get it.')
-            self.access_token = self.get_access_token()
-        else:
-            logger.debug('Use old access token')
-        return self.access_token
-
-    @access_token.setter
-    def access_token(self, value):
-        self.access_token = value
-        if isinstance(value, str_type) and len(value) >= 12:
-            self.censored_access_token = '{}***{}'.format(value[:4], value[-4:])
-        else:
-            self.censored_access_token = value
-        logger.debug('access_token = %r', self.censored_access_token)
-        self.access_token_is_needed = not self.access_token
-
-    @staticmethod
-    def get_user_login():
-        logger.debug('Do nothing to get user login')
-
-    def get_access_token(self):
-        """
-        Dummy method
-        """
-        logger.debug('API.get_access_token()')
-        return self.access_token
-
     def make_request(self, method_request, captcha_response=None):
 
         logger.debug('Prepare API Method request')
