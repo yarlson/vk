@@ -7,7 +7,7 @@ from vk.logs import LOGGING_CONFIG
 from vk.mixins import AuthMixin, InteractiveMixin
 from vk.utils import stringify_values, json_iter_parse, LoggingSession, str_type
 
-VERSION = '2.0.2'
+VERSION = '2.0.3'
 
 logging.config.dictConfig(LOGGING_CONFIG)
 logger = logging.getLogger('vk')

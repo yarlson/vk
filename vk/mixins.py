@@ -10,7 +10,6 @@ logger = logging.getLogger('vk')
 
 class AuthMixin(object):
     LOGIN_URL = 'https://m.vk.com'
-    # REDIRECT_URI = 'https://oauth.vk.com/blank.html'
     AUTHORIZE_URL = 'https://oauth.vk.com/authorize'
     CAPTCHA_URI = 'https://m.vk.com/captcha.php'
 
