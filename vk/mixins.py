@@ -34,28 +34,8 @@ class AuthMixin(object):
         if self.user_login:
             self.access_token = self.get_access_token()
 
-    @property
-    def user_login(self):
-        if not self.user_login:
-            self.user_login = self.get_user_login()
-        return self.user_login
-
-    @user_login.setter
-    def user_login(self, value):
-        self.user_login = value
-
     def get_user_login(self):
         return self.user_login
-
-    @property
-    def user_password(self):
-        if not self.user_password:
-            self.user_password = self.get_user_password()
-        return self.user_password
-
-    @user_password.setter
-    def user_password(self, value):
-        self.user_password = value
 
     def get_user_password(self):
         return self.user_password
