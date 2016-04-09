@@ -14,7 +14,7 @@ class AuthMixin(object):
     AUTHORIZE_URL = 'https://oauth.vk.com/authorize'
     CAPTCHA_URI = 'https://m.vk.com/captcha.php'
 
-    def __init__(self, app_id=None, user_login='', user_password='', scope='offline', **kwargs):
+    def __init__(self, app_id=None, user_login='', user_password='', scope='offline', redirect_uri='', **kwargs):
         logger.debug(
             'AuthMixin.__init__(app_id=%(app_id)r, user_login=%(user_login)r, user_password=%(user_password)r, '
             '**kwargs=%(kwargs)s)',
@@ -26,6 +26,7 @@ class AuthMixin(object):
         self.user_login = user_login
         self.user_password = user_password
         self.scope = scope
+        self.redirect_uri = redirect_uri
 
         self.auth_session = None
 
@@ -120,6 +121,7 @@ class AuthMixin(object):
             'response_type': 'token',
             'scope': self.scope,
             'v': '5.28',
+            'redirect_uri': self.redirect_uri,
         }
         response = self.auth_session.post(self.AUTHORIZE_URL, auth_data)
         response_url_query = get_url_query(response.url)
